@@ -26,21 +26,17 @@
     /* Path Aliases */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
-      "@styles/*": ["./src/styles/*"],
-      "~/*": ["./src/*"],
-      "@payload-config": ["./src/payload.config.ts"]
+      "~/*": ["./src/*"]
     }
   },
   "include": [
+    ".eslintrc.cjs",
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     "**/*.cjs",
-    "**/*.mts",
-    ".next/types/**/*.ts",
-    "src/scripts/**/*",
-    "next.config.tjs"
+    "**/*.js",
+    ".next/types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }

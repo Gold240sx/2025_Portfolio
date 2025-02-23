@@ -7,8 +7,6 @@ import {
   text,
   timestamp,
   varchar,
-  pgTable,
-  serial,
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
 
@@ -18,19 +16,41 @@ import { type AdapterAccount } from "next-auth/adapters";
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-export const createTable = pgTableCreator((name) => `PayloadPortfolio_${name}`);
+export const createTable = pgTableCreator((name) => `T3Test_${name}`);
 
-export const users = pgTable("PayloadPortfolio_users", {
-  id: varchar("id", { length: 255 }).primaryKey(),
-  email: varchar("email", { length: 255 }).notNull().unique(),
+export const posts = createTable(
+  "post",
+  {
+    id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+    name: varchar("name", { length: 256 }),
+    createdById: varchar("created_by", { length: 255 })
+      .notNull()
+      .references(() => users.id),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+      () => new Date()
+    ),
+  },
+  (example) => ({
+    createdByIdIdx: index("created_by_idx").on(example.createdById),
+    nameIndex: index("name_idx").on(example.name),
+  })
+);
+
+export const users = createTable("user", {
+  id: varchar("id", { length: 255 })
+    .notNull()
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   name: varchar("name", { length: 255 }),
-  password: varchar("password", { length: 255 }),
-  resetPasswordToken: varchar("reset_password_token", { length: 255 }),
-  resetPasswordExpiration: timestamp("reset_password_expiration"),
-  loginAttempts: integer("login_attempts").default(0),
-  lockUntil: timestamp("lock_until"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  email: varchar("email", { length: 255 }).notNull(),
+  emailVerified: timestamp("email_verified", {
+    mode: "date",
+    withTimezone: true,
+  }).default(sql`CURRENT_TIMESTAMP`),
+  image: varchar("image", { length: 255 }),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -63,7 +83,7 @@ export const accounts = createTable(
       columns: [account.provider, account.providerAccountId],
     }),
     userIdIdx: index("account_user_id_idx").on(account.userId),
-  }),
+  })
 );
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
@@ -86,7 +106,7 @@ export const sessions = createTable(
   },
   (session) => ({
     userIdIdx: index("session_user_id_idx").on(session.userId),
-  }),
+  })
 );
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
@@ -105,13 +125,5 @@ export const verificationTokens = createTable(
   },
   (vt) => ({
     compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
-  }),
+  })
 );
-
-export const media = pgTable("PayloadPortfolio_media", {
-  id: serial("id").primaryKey(),
-  filename: text("filename").notNull(),
-  alt: text("alt"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
