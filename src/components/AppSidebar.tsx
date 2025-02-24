@@ -7,15 +7,19 @@ import {
   ChevronUp,
   CircleDollarSign,
   Code,
+  DatabaseIcon,
   FileImage,
   FileText,
   FileType,
   FolderPen,
   Home,
+  ImageUp,
   Infinity,
   Info,
+  LinkIcon,
   LogOut,
   Menu,
+  MessageCircle,
   Newspaper,
   PanelLeftDashed,
   Pickaxe,
@@ -93,8 +97,41 @@ const sectionGroups: SectionGroup[] = [
         items: [
           {
             title: "Welcome",
-            url: "/dashboard",
+            url: "/admin/welcome",
             icon: Info,
+          },
+          {
+            title: "Dashboard",
+            url: "/admin",
+            icon: Info,
+          },
+        ],
+      },
+      {
+        id: "Users",
+        title: "Users",
+        icon: Users,
+        iconBgColor: "bg-red-100",
+        iconColor: "text-red-600",
+        items: [
+          {
+            title: "Users",
+            url: "/admin/users",
+            icon: Users,
+          },
+        ],
+      },
+      {
+        id: "messages",
+        title: "Messages",
+        icon: MessageCircle,
+        iconBgColor: "bg-purple-300",
+        iconColor: "text-purple-600",
+        items: [
+          {
+            title: "Messages",
+            url: "/admin/messages",
+            icon: MessageCircle,
           },
         ],
       },
@@ -107,7 +144,7 @@ const sectionGroups: SectionGroup[] = [
         items: [
           {
             title: "Users",
-            url: "/stats/users",
+            url: "/admin/stats/users",
             icon: Users,
           },
         ],
@@ -133,7 +170,17 @@ const sectionGroups: SectionGroup[] = [
           {
             title: "Data Content",
             url: "/admin/webcontent/data-content",
-            icon: Activity,
+            icon: DatabaseIcon,
+          },
+          {
+            title: "Links",
+            url: "/admin/webcontent/links",
+            icon: LinkIcon,
+          },
+          {
+            title: "Media",
+            url: "/admin/webcontent/media",
+            icon: ImageUp,
           },
         ],
       },

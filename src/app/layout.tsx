@@ -4,6 +4,8 @@ import { type Metadata } from "next";
 import { Providers } from "./providers";
 import { Navbar } from "~/components/Navbar";
 import { AnimatePresence } from "framer-motion";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -24,6 +26,8 @@ export default function RootLayout({
             <Navbar />
             <AnimatePresence mode="wait">{children}</AnimatePresence>
           </div>
+          <Toaster />
+          <SonnerToaster />
         </Providers>
       </body>
     </html>
