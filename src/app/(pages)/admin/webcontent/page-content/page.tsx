@@ -1,27 +1,38 @@
 "use client";
 
-import { TipTapEditor } from "~/components/editor/TipTapEditor";
-import { api } from "~/trpc/react";
+import { useState } from "react";
+import { PageSelector } from "~/components/admin/PageSelector";
+import { ContentEditor } from "~/components/admin/ContentEditor";
+import { type ContentSection, pageConfigs } from "~/types/content";
 import { useToast } from "@/hooks/use-toast";
-import { useState, useEffect } from "react";
+import { api } from "~/trpc/react";
+import { DatabaseInfoPanel } from "~/components/admin/DatabaseInfoPanel";
+import { type PageConfig } from "~/types/content";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
-import { TipTapToggleGroup } from "~/components/editor/TipTapToggleGroup";
+import { Code } from "lucide-react";
+
+type PageKey = "about" | "projects" | "contact" | "blog";
 
 export default function PageContentPage() {
+  const [currentPage, setCurrentPage] = useState<PageKey>("about");
   const [isEditing, setIsEditing] = useState(false);
-  const [localContent, setLocalContent] = useState("");
   const [mode, setMode] = useState<"edit" | "preview">("edit");
-  const { data: content, isLoading } = api.siteContent.getAboutMe.useQuery();
+  const [isInfoPanelMinimized, setIsInfoPanelMinimized] = useState(false);
+
+  const config = pageConfigs[currentPage];
+  if (!config) return null;
+
+  const { data: content, isLoading } =
+    api.siteContent.getAboutMeContent.useQuery();
   const utils = api.useUtils();
   const { toast } = useToast();
+
   const { mutate: updateContent, isPending } =
     api.siteContent.updateAboutMe.useMutation({
       onSuccess: () => {
-        toast({
-          title: "Content saved successfully!",
-        });
-        utils.siteContent.getAboutMe.invalidate();
+        toast({ title: "Content saved successfully!" });
+        utils.siteContent.getAboutMeContent.invalidate();
+        setIsEditing(false);
       },
       onError: (error) => {
         toast({
@@ -31,55 +42,102 @@ export default function PageContentPage() {
       },
     });
 
-  useEffect(() => {
-    if (content !== undefined) {
-      setLocalContent(content);
-    }
-  }, [content]);
-
-  const handleCancel = () => {
-    setLocalContent(content ?? "");
-    setMode("edit");
+  const handleSave = (section: ContentSection) => {
+    updateContent({
+      title: section.title,
+      content: section.content,
+    });
   };
 
-  const handleSave = () => {
-    updateContent({ content: localContent });
+  const handlePageChange = (pageId: string) => {
+    setCurrentPage(pageId as PageKey);
     setIsEditing(false);
     setMode("edit");
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  const renderEditor = () => {
+    switch (currentPage) {
+      case "about":
+        return (
+          <ContentEditor
+            section={{
+              title: content?.title ?? config.title,
+              content: content?.content ?? "",
+              updatedAt: content?.updatedAt ?? undefined,
+              updatedBy: content?.updatedBy ?? undefined,
+            }}
+            isEditing={isEditing}
+            setIsEditing={setIsEditing}
+            mode={mode}
+            setMode={setMode}
+            onSave={handleSave}
+            isPending={isPending}
+          />
+        );
+      case "projects":
+        return (
+          <div className="flex min-h-[500px] flex-col space-y-6 rounded-lg bg-card p-6 shadow-sm">
+            <h2 className="text-xl font-semibold text-foreground">
+              Projects Page Content
+            </h2>
+            <p className="text-muted-foreground">
+              Configure your projects page content here.
+            </p>
+          </div>
+        );
+      case "contact":
+        return (
+          <div className="flex min-h-[500px] flex-col space-y-6 rounded-lg bg-card p-6 shadow-sm">
+            <h2 className="text-xl font-semibold text-foreground">
+              Contact Page Content
+            </h2>
+            <p className="text-muted-foreground">
+              Configure your contact page content here.
+            </p>
+          </div>
+        );
+      case "blog":
+        return (
+          <div className="flex min-h-[500px] flex-col space-y-6 rounded-lg bg-card p-6 shadow-sm">
+            <h2 className="text-xl font-semibold text-foreground">
+              Blog Page Content
+            </h2>
+            <p className="text-muted-foreground">
+              Configure your blog page content here.
+            </p>
+          </div>
+        );
+    }
+  };
 
   return (
-    <div className="container relative mx-auto p-6">
-      <div className="rounded-lg bg-white p-6 shadow-sm">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Edit About Me</h2>
-          {isEditing && <TipTapToggleGroup mode={mode} setMode={setMode} />}
-        </div>
-        <TipTapEditor
-          content={localContent}
-          onChange={setLocalContent}
-          isEditing={isEditing}
-          onEditToggle={setIsEditing}
-          onCancel={handleCancel}
-          mode={mode}
-        />
-        {isEditing && (
-          <div className="mt-4 flex justify-end gap-2">
-            <Button
-              variant="outline"
-              onClick={() => {
-                handleCancel();
-                setIsEditing(false);
+    <div className="container relative mx-auto space-y-6 p-6">
+      <PageSelector currentPage={currentPage} onPageChange={handlePageChange} />
+      <div className="grid grid-cols-[1fr,auto] gap-6">
+        {renderEditor()}
+        {isInfoPanelMinimized ? (
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setIsInfoPanelMinimized(false)}
+            className="h-8 w-8"
+          >
+            <Code className="h-4 w-4" />
+            <span className="sr-only">Show database info</span>
+          </Button>
+        ) : (
+          currentPage === "about" && (
+            <DatabaseInfoPanel
+              content={{
+                title: content?.title ?? "",
+                content: content?.content ?? "",
+                updatedAt: content?.updatedAt ?? null,
+                updatedBy: content?.updatedBy ?? null,
               }}
-            >
-              Cancel
-            </Button>
-            <Button onClick={handleSave} disabled={isPending}>
-              {isPending ? "Saving..." : "Save Changes"}
-            </Button>
-          </div>
+              tableName={config.table}
+              onMinimize={() => setIsInfoPanelMinimized(true)}
+            />
+          )
         )}
       </div>
     </div>

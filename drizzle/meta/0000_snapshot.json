@@ -1,5 +1,5 @@
 {
-  "id": "de31e803-8f37-473f-bcae-2880abeec2c1",
+  "id": "b95a3851-305d-4627-9e99-b7f42189a2c7",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -286,6 +286,25 @@
         "content": {
           "name": "content",
           "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_by": {
+          "name": "updated_by",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
         }

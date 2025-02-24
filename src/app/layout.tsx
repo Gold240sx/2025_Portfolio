@@ -6,6 +6,8 @@ import { Navbar } from "~/components/Navbar";
 import { AnimatePresence } from "framer-motion";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "~/components/providers/theme-provider";
+import { cn } from "~/lib/utils";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -19,16 +21,29 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={GeistSans.variable}>
-      <body className="min-h-screen bg-gradient-to-b from-[#2e026d] to-[#15162c]">
-        <Providers>
-          <div className="flex min-h-screen flex-col">
-            <Navbar />
-            <AnimatePresence mode="wait">{children}</AnimatePresence>
-          </div>
-          <Toaster />
-          <SonnerToaster />
-        </Providers>
+    <html lang="en" className={GeistSans.variable} suppressHydrationWarning>
+      <body
+        className={cn(
+          "min-h-screen bg-gradient-to-b",
+          "dark:from-[#2e026d] dark:to-[#15162c] dark:text-white",
+          "from-blue-50 to-indigo-100",
+        )}
+      >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Providers>
+            <div className="flex min-h-screen flex-col">
+              <Navbar />
+              <AnimatePresence mode="wait">{children}</AnimatePresence>
+            </div>
+            <Toaster />
+            <SonnerToaster />
+          </Providers>
+        </ThemeProvider>
       </body>
     </html>
   );

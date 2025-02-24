@@ -38,7 +38,7 @@ export default async function DashboardPage() {
               {isAdmin && (
                 <Link
                   href="/admin"
-                  className="mt-2 inline-block rounded bg-white/10 px-4 py-2 text-sm font-medium text-white hover:bg-white/20"
+                  className="mt-2 inline-block rounded bg-white/10 px-4 py-2 text-sm font-medium hover:bg-white/20"
                 >
                   Admin Dashboard
                 </Link>

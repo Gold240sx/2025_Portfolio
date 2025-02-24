@@ -33,14 +33,12 @@
   }
 }
 
-
-
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    --foreground: 215 25% 27%;
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --card-foreground: 215 25% 27%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
     --primary: 240 5.9% 10%;
@@ -74,7 +72,7 @@
   .dark {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
+    --card: 240 10% 12%;
     --card-foreground: 0 0% 98%;
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
@@ -96,7 +94,7 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
+    --sidebar-background: 240 10% 8%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
@@ -105,9 +103,17 @@
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
+  .no-visible-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .no-visible-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }
-
-
 
 @layer base {
   * {

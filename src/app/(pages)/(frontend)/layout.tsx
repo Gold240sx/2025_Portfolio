@@ -7,7 +7,7 @@ export default function FrontendLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen w-screen flex-col">
+    <div className="flex min-h-screen w-screen flex-col dark:text-white">
       <PageLayout>{children}</PageLayout>
     </div>
   );

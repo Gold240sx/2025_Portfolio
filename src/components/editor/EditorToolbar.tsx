@@ -69,181 +69,185 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
   if (!editor) return null;
 
   return (
-    <div className="border-b border-gray-200 bg-white">
-      <div className="overflow-x-auto">
-        <div className="flex min-w-max items-center gap-1 p-1 sm:gap-2 sm:p-2">
-          {/* Basic Formatting */}
-          <div className="flex gap-0.5 sm:gap-1">
+    <div className="flex flex-wrap items-center gap-1 border-b bg-white p-2 dark:bg-zinc-900">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => editor.chain().focus().toggleBold().run()}
+        className={cn(
+          "h-8 px-2 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900",
+          "dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200",
+          editor.isActive("bold") &&
+            "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-200",
+        )}
+      >
+        <Bold className="h-4 w-4" />
+      </Button>
+
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => editor.chain().focus().toggleItalic().run()}
+        className={cn(
+          "h-8 px-2 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900",
+          "dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200",
+          editor.isActive("italic") &&
+            "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-200",
+        )}
+      >
+        <Italic className="h-4 w-4" />
+      </Button>
+
+      <div className="mx-0.5 h-4 w-px bg-gray-200 sm:mx-2" />
+
+      {/* Headings */}
+      <div className="flex gap-0.5 sm:gap-1">
+        {[Heading1, Heading2, Heading3].map((Icon, index) => (
+          <Button
+            key={index}
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-1.5 sm:h-9 sm:w-9 sm:p-2"
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .toggleHeading({ level: (index + 1) as 1 | 2 | 3 })
+                .run()
+            }
+          >
+            <Icon className="h-full w-full" />
+          </Button>
+        ))}
+      </div>
+
+      <div className="mx-0.5 h-4 w-px bg-gray-200 sm:mx-2" />
+
+      {/* Alignment */}
+      <div className="flex gap-0.5 sm:gap-1">
+        {[
+          { icon: AlignLeft, align: "left" },
+          { icon: AlignCenter, align: "center" },
+          { icon: AlignRight, align: "right" },
+        ].map(({ icon: Icon, align }) => (
+          <Button
+            key={align}
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-1.5 sm:h-9 sm:w-9 sm:p-2"
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .setTextAlign(align as any)
+                .run()
+            }
+          >
+            <Icon className="h-full w-full" />
+          </Button>
+        ))}
+      </div>
+
+      <div className="mx-0.5 h-4 w-px bg-gray-200 sm:mx-2" />
+
+      {/* Lists and Quote */}
+      <div className="flex gap-0.5 sm:gap-1">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 w-8 p-1.5 sm:h-9 sm:w-9 sm:p-2"
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
+        >
+          <List className="h-full w-full" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 w-8 p-1.5 sm:h-9 sm:w-9 sm:p-2"
+          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        >
+          <ListOrdered className="h-full w-full" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 w-8 p-1.5 sm:h-9 sm:w-9 sm:p-2"
+          onClick={() => editor.chain().focus().toggleBlockquote().run()}
+        >
+          <Quote className="h-full w-full" />
+        </Button>
+      </div>
+
+      <div className="mx-0.5 h-4 w-px bg-gray-200 sm:mx-2" />
+
+      {/* Color and Font Size */}
+      <div className="flex gap-0.5 sm:gap-1">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
               size="sm"
               className="h-8 w-8 p-1.5 sm:h-9 sm:w-9 sm:p-2"
-              onClick={() => editor.chain().focus().toggleBold().run()}
             >
-              <Bold className="h-full w-full" />
+              <Palette className="h-full w-full" />
             </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-1.5 sm:h-9 sm:w-9 sm:p-2"
-              onClick={() => editor.chain().focus().toggleItalic().run()}
-            >
-              <Italic className="h-full w-full" />
-            </Button>
-          </div>
-
-          <div className="mx-0.5 h-4 w-px bg-gray-200 sm:mx-2" />
-
-          {/* Headings */}
-          <div className="flex gap-0.5 sm:gap-1">
-            {[Heading1, Heading2, Heading3].map((Icon, index) => (
-              <Button
-                key={index}
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-1.5 sm:h-9 sm:w-9 sm:p-2"
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="grid grid-cols-4 gap-1 p-1">
+            {COLORS.map((color) => (
+              <DropdownMenuItem
+                key={color.hex}
                 onClick={() =>
                   editor
                     .chain()
                     .focus()
-                    .toggleHeading({ level: (index + 1) as 1 | 2 | 3 })
+                    .setMark("textStyle", { color: color.hex })
                     .run()
                 }
+                className="flex h-8 w-8 items-center justify-center p-0"
+                title={color.name}
               >
-                <Icon className="h-full w-full" />
-              </Button>
+                <div
+                  className="h-6 w-6 rounded-md border border-gray-200"
+                  style={{ backgroundColor: color.hex }}
+                />
+              </DropdownMenuItem>
             ))}
-          </div>
-
-          <div className="mx-0.5 h-4 w-px bg-gray-200 sm:mx-2" />
-
-          {/* Alignment */}
-          <div className="flex gap-0.5 sm:gap-1">
-            {[
-              { icon: AlignLeft, align: "left" },
-              { icon: AlignCenter, align: "center" },
-              { icon: AlignRight, align: "right" },
-            ].map(({ icon: Icon, align }) => (
-              <Button
-                key={align}
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-1.5 sm:h-9 sm:w-9 sm:p-2"
-                onClick={() =>
-                  editor
-                    .chain()
-                    .focus()
-                    .setTextAlign(align as any)
-                    .run()
-                }
-              >
-                <Icon className="h-full w-full" />
-              </Button>
-            ))}
-          </div>
-
-          <div className="mx-0.5 h-4 w-px bg-gray-200 sm:mx-2" />
-
-          {/* Lists and Quote */}
-          <div className="flex gap-0.5 sm:gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-1.5 sm:h-9 sm:w-9 sm:p-2"
-              onClick={() => editor.chain().focus().toggleBulletList().run()}
-            >
-              <List className="h-full w-full" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-1.5 sm:h-9 sm:w-9 sm:p-2"
-              onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            >
-              <ListOrdered className="h-full w-full" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-1.5 sm:h-9 sm:w-9 sm:p-2"
-              onClick={() => editor.chain().focus().toggleBlockquote().run()}
-            >
-              <Quote className="h-full w-full" />
-            </Button>
-          </div>
-
-          <div className="mx-0.5 h-4 w-px bg-gray-200 sm:mx-2" />
-
-          {/* Color and Font Size */}
-          <div className="flex gap-0.5 sm:gap-1">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 w-8 p-1.5 sm:h-9 sm:w-9 sm:p-2"
-                >
-                  <Palette className="h-full w-full" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="grid grid-cols-4 gap-1 p-1">
-                {COLORS.map((color) => (
-                  <DropdownMenuItem
-                    key={color.hex}
-                    onClick={() =>
-                      editor
-                        .chain()
-                        .focus()
-                        .setMark("textStyle", { color: color.hex })
-                        .run()
-                    }
-                    className="flex h-8 w-8 items-center justify-center p-0"
-                    title={color.name}
-                  >
-                    <div
-                      className="h-6 w-6 rounded-md border border-gray-200"
-                      style={{ backgroundColor: color.hex }}
-                    />
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-1.5 sm:h-9 sm:w-9 sm:p-2"
-              onClick={() => {
-                const currentSize =
-                  editor.getAttributes("textStyle").fontSize || "16px";
-                const size = parseInt(currentSize) - 2;
-                editor
-                  .chain()
-                  .focus()
-                  .setMark("textStyle", { fontSize: `${size}px` })
-                  .run();
-              }}
-            >
-              <AArrowDown className="h-full w-full" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-1.5 sm:h-9 sm:w-9 sm:p-2"
-              onClick={() => {
-                const currentSize =
-                  editor.getAttributes("textStyle").fontSize || "16px";
-                const size = parseInt(currentSize) + 2;
-                editor
-                  .chain()
-                  .focus()
-                  .setMark("textStyle", { fontSize: `${size}px` })
-                  .run();
-              }}
-            >
-              <AArrowUp className="h-full w-full" />
-            </Button>
-          </div>
-        </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 w-8 p-1.5 sm:h-9 sm:w-9 sm:p-2"
+          onClick={() => {
+            const currentSize =
+              editor.getAttributes("textStyle").fontSize || "16px";
+            const size = parseInt(currentSize) - 2;
+            editor
+              .chain()
+              .focus()
+              .setMark("textStyle", { fontSize: `${size}px` })
+              .run();
+          }}
+        >
+          <AArrowDown className="h-full w-full" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 w-8 p-1.5 sm:h-9 sm:w-9 sm:p-2"
+          onClick={() => {
+            const currentSize =
+              editor.getAttributes("textStyle").fontSize || "16px";
+            const size = parseInt(currentSize) + 2;
+            editor
+              .chain()
+              .focus()
+              .setMark("textStyle", { fontSize: `${size}px` })
+              .run();
+          }}
+        >
+          <AArrowUp className="h-full w-full" />
+        </Button>
       </div>
     </div>
   );

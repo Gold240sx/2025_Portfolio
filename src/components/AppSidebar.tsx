@@ -58,6 +58,9 @@ import { useState, useEffect } from "react";
 import { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { SafeLog } from "@/utils/safeLog";
+import { signOut } from "next-auth/react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useSession } from "next-auth/react";
 
 type MenuItem = {
   title: string;
@@ -92,8 +95,8 @@ const sectionGroups: SectionGroup[] = [
         id: "dashboard",
         title: "Dashboard",
         icon: Home,
-        iconBgColor: "bg-indigo-100",
-        iconColor: "text-indigo-600",
+        iconBgColor: "bg-indigo-100 dark:bg-indigo-950",
+        iconColor: "text-indigo-600 dark:text-indigo-200",
         items: [
           {
             title: "Welcome",
@@ -111,8 +114,8 @@ const sectionGroups: SectionGroup[] = [
         id: "Users",
         title: "Users",
         icon: Users,
-        iconBgColor: "bg-red-100",
-        iconColor: "text-red-600",
+        iconBgColor: "bg-red-100 dark:bg-red-950",
+        iconColor: "text-red-600 dark:text-red-200",
         items: [
           {
             title: "Users",
@@ -125,8 +128,8 @@ const sectionGroups: SectionGroup[] = [
         id: "messages",
         title: "Messages",
         icon: MessageCircle,
-        iconBgColor: "bg-purple-300",
-        iconColor: "text-purple-600",
+        iconBgColor: "bg-purple-300 dark:bg-purple-950",
+        iconColor: "text-purple-600 dark:text-purple-200",
         items: [
           {
             title: "Messages",
@@ -139,8 +142,8 @@ const sectionGroups: SectionGroup[] = [
         id: "stats",
         title: "Stats",
         icon: Tally5,
-        iconBgColor: "bg-green-100",
-        iconColor: "text-green-600",
+        iconBgColor: "bg-green-100 dark:bg-green-950",
+        iconColor: "text-green-600 dark:text-green-200",
         items: [
           {
             title: "Users",
@@ -159,8 +162,8 @@ const sectionGroups: SectionGroup[] = [
         id: "webcontent",
         title: "Web Content",
         icon: FileText,
-        iconBgColor: "bg-blue-100",
-        iconColor: "text-blue-600",
+        iconBgColor: "bg-blue-100 dark:bg-blue-950",
+        iconColor: "text-blue-600 dark:text-blue-200",
         items: [
           {
             title: "Page Content",
@@ -204,6 +207,7 @@ export function AppSidebar() {
     Record<string, boolean>
   >(getInitialExpandedSections(sectionGroups));
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   const isCurrentPath = (url: string) => pathname === url;
 
@@ -252,18 +256,24 @@ export function AppSidebar() {
         onClick={() => {
           setOpenMobile(true);
         }}
-        className="hover:bg-accent z-50 my-2 ml-4 mt-4 h-fit w-fit rounded-md bg-white p-2 shadow-black/30 md:hidden lg:hidden"
+        className="absolute left-4 top-2 z-50 my-2 h-fit w-fit rounded-md bg-white/20 p-2 shadow-black/30 hover:bg-accent md:hidden lg:hidden"
       >
-        <PanelLeftDashed className="h-5 w-5" />
+        <PanelLeftDashed className="h-5 w-5 text-white" />
       </button>
       <Sidebar variant="sidebar" collapsible="icon">
-        <SidebarContent className="relative flex h-full flex-col bg-white">
+        <SidebarContent className="relative flex h-full flex-col bg-white dark:bg-zinc-900">
           <div className="relative">
             <div className="absolute right-2 top-2 z-10 data-[state=collapsed]:left-[0.6rem] data-[state=collapsed]:right-auto lg:block">
               <SidebarTrigger className="data-[state=closed]:absolute data-[state=closed]:-right-10 data-[state=closed]:top-0" />
             </div>
           </div>
-          <div className="flex h-full flex-col">
+          <div
+            className={cn(
+              "flex h-screen flex-col border-r",
+              "bg-sidebar-background shadow-lg",
+              "border-sidebar-border",
+            )}
+          >
             <div className="mt-6 flex-1 overflow-y-auto pb-[120px] pt-2">
               <SidebarGroup>
                 <SidebarGroupLabel className="sr-only mb-6 px-2 py-4 text-xl font-bold data-[state=collapsed]:hidden">
@@ -317,7 +327,7 @@ export function AppSidebar() {
                                 </div>
                                 <span
                                   className={cn(
-                                    "text-sidebar-foreground/70 flex-1 text-left text-lg font-medium transition-all duration-200 ease-in hover:pl-1 data-[state=collapsed]:hidden",
+                                    "flex-1 text-left text-lg font-medium text-sidebar-foreground/70 transition-all duration-200 ease-in hover:pl-1 data-[state=collapsed]:hidden",
                                     !expandedSections[section.id] &&
                                       sectionContainsCurrentPath(section) &&
                                       "text-blue-600",
@@ -327,7 +337,7 @@ export function AppSidebar() {
                                 </span>
                                 <ChevronUp
                                   className={cn(
-                                    "text-sidebar-foreground/70 h-4 w-4 transition-transform data-[state=collapsed]:hidden",
+                                    "h-4 w-4 text-sidebar-foreground/70 transition-transform data-[state=collapsed]:hidden",
                                     {
                                       "rotate-180":
                                         !expandedSections[section.id],
@@ -412,60 +422,36 @@ export function AppSidebar() {
             </div>
 
             {/* Footer */}
-            <div className="bg-background absolute bottom-0 left-0 right-0">
+            <div className="absolute bottom-0 left-0 right-0 dark:bg-zinc-900">
               <Separator className="my-2" />
               <SidebarGroup>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    <SidebarMenuItem>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div className="flex items-center gap-2 py-1.5 data-[state=collapsed]:justify-center data-[state=collapsed]:px-2">
-                              <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-full">
-                                <img
-                                  src="https://media.licdn.com/dms/image/v2/C4E0BAQGqRyRh_kmy4Q/company-logo_200_200/company-logo_200_200/0/1630582118391/goparco_logo?e=2147483647&v=beta&t=4oX9T17qzp5O9eOhEeSSygw_HVNM6x_JQwAYn0VC5LE"
-                                  alt="Parco Logo"
-                                  className="h-full w-full object-cover"
-                                />
-                              </div>
-                              <div className="flex flex-col overflow-hidden data-[state=collapsed]:hidden">
-                                <span className="text-sidebar-foreground/70 text-xs">
-                                  Signed in as
-                                </span>
-                                <span className="truncate text-sm font-bold text-gray-500">
-                                  ADMIN
-                                </span>
-                              </div>
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent
-                            side="right"
-                            className="data-[state=expanded]:hidden"
-                          >
-                            <div className="flex flex-col">
-                              <span className="text-xs">Signed in as</span>
-                              <span className="font-bold">ADMIN</span>
-                            </div>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton
-                        onClick={handleSignOut}
-                        className="w-full bg-blue-600 hover:bg-blue-700"
-                      >
-                        <LogOut className="h-4 w-4 text-white" />
-                        {!isCollapsed && (
-                          <span className="flex-1 text-center text-white">
-                            Sign out
-                          </span>
-                        )}
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </SidebarMenu>
-                </SidebarGroupContent>
+                <div className="mb-2 flex items-center gap-3 py-2">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={session?.user?.image ?? ""} />
+                    <AvatarFallback>
+                      {session?.user?.name?.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium text-black dark:text-white">
+                      {session?.user?.name}
+                    </span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {session?.user?.email}
+                    </span>
+                  </div>
+                </div>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    onClick={() => void signOut()}
+                    className="mb-2 w-full bg-blue-600 text-white hover:bg-blue-700"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    {!isCollapsed && (
+                      <span className="flex-1 text-center">Sign out</span>
+                    )}
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
               </SidebarGroup>
             </div>
           </div>

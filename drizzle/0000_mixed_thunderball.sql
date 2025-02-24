@@ -29,7 +29,10 @@ CREATE TABLE IF NOT EXISTS "T3Test_session" (
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "T3Test_site_content" (
 	"key" varchar(255) PRIMARY KEY NOT NULL,
-	"content" text
+	"content" text,
+	"title" text,
+	"updated_at" timestamp DEFAULT now(),
+	"updated_by" varchar(255)
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "T3Test_user" (

@@ -1,6 +1,6 @@
 export default function ProjectsPage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 text-white">
+    <main className="flex min-h-screen flex-col items-center justify-center p-4">
       <div className="container mx-auto max-w-4xl">
         <h1 className="mb-8 text-4xl font-bold">My Projects</h1>
         <div className="grid gap-6 md:grid-cols-2">

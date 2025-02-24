@@ -1,17 +1,21 @@
-import { api } from "~/trpc/server";
+"use client";
 
-export default async function AboutPage() {
-  const content = await api.siteContent.getAboutMe();
+import { api } from "~/trpc/react";
+
+export default function AboutPage() {
+  const { data, isLoading } = api.siteContent.getAboutMeContent.useQuery();
+
+  if (isLoading) return <div>Loading...</div>;
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 text-white">
-      <div className="container mx-auto max-w-2xl">
-        <h1 className="mb-8 text-4xl font-bold">About Me</h1>
-        <div
-          className="prose prose-invert max-w-none whitespace-pre-wrap"
-          dangerouslySetInnerHTML={{ __html: content }}
-        />
-      </div>
-    </main>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="mb-8 text-4xl font-bold text-white">
+        {data?.title || "About Me"}
+      </h1>
+      <div
+        className="prose prose-invert max-w-none"
+        dangerouslySetInnerHTML={{ __html: data?.content ?? "" }}
+      />
+    </div>
   );
 }

@@ -21,6 +21,9 @@ export const createTable = pgTableCreator((name) => `T3Test_${name}`);
 export const siteContent = createTable("site_content", {
   key: varchar("key", { length: 255 }).primaryKey(),
   content: text("content"),
+  title: text("title"),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  updatedBy: varchar("updated_by", { length: 255 }),
 });
 
 export const posts = createTable(
