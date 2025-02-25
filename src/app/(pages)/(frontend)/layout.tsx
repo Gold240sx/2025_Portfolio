@@ -8,6 +8,7 @@ export default function FrontendLayout({
 }) {
   return (
     <div className="flex min-h-screen w-screen flex-col dark:text-white">
+      <Navbar />
       <PageLayout>{children}</PageLayout>
     </div>
   );

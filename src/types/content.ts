@@ -16,6 +16,13 @@ export type PageConfig = {
 };
 
 export const pageConfigs = {
+  home: {
+    title: "Home",
+    value: "home",
+    table: "T3Test_site_content",
+    getQuery: "getHomeContent",
+    updateQuery: "updateHome",
+  },
   about: {
     title: "About Me",
     value: "about",

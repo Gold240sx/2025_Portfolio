@@ -57,7 +57,7 @@ import {
 import { useState, useEffect } from "react";
 import { LucideIcon } from "lucide-react";
 import Link from "next/link";
-import { SafeLog } from "@/utils/safeLog";
+import { safeLog } from "@/utils/safeLog";
 import { signOut } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSession } from "next-auth/react";
@@ -244,9 +244,9 @@ export function AppSidebar() {
         throw new Error("Failed to sign out");
       }
 
-      router.push("/sign-in");
+      router.push("/");
     } catch (error) {
-      SafeLog({ display: false, log: { "Sign out error": error } });
+      safeLog({ display: false, log: { "Sign out error": error } });
     }
   };
 
@@ -261,7 +261,7 @@ export function AppSidebar() {
         <PanelLeftDashed className="h-5 w-5 text-white" />
       </button>
       <Sidebar variant="sidebar" collapsible="icon">
-        <SidebarContent className="relative flex h-full flex-col bg-white dark:bg-zinc-900">
+        <SidebarContent className="relative flex h-full flex-col overflow-hidden bg-white dark:bg-zinc-900">
           <div className="relative">
             <div className="absolute right-2 top-2 z-10 data-[state=collapsed]:left-[0.6rem] data-[state=collapsed]:right-auto lg:block">
               <SidebarTrigger className="data-[state=closed]:absolute data-[state=closed]:-right-10 data-[state=closed]:top-0" />
@@ -274,7 +274,8 @@ export function AppSidebar() {
               "border-sidebar-border",
             )}
           >
-            <div className="mt-6 flex-1 overflow-y-auto pb-[120px] pt-2">
+            {/* Sidebar Items */}
+            <div className="mt-6 flex-1 overflow-y-auto pb-[180px] pt-2">
               <SidebarGroup>
                 <SidebarGroupLabel className="sr-only mb-6 px-2 py-4 text-xl font-bold data-[state=collapsed]:hidden">
                   APIs
@@ -443,7 +444,7 @@ export function AppSidebar() {
                 </div>
                 <SidebarMenuItem>
                   <SidebarMenuButton
-                    onClick={() => void signOut()}
+                    onClick={() => void handleSignOut()}
                     className="mb-2 w-full bg-blue-600 text-white hover:bg-blue-700"
                   >
                     <LogOut className="h-4 w-4" />

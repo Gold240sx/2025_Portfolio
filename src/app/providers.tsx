@@ -7,7 +7,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SessionProvider>
-      <SidebarProvider defaultOpen={false}>
+      <SidebarProvider>
         <TRPCReactProvider>{children}</TRPCReactProvider>
       </SidebarProvider>
     </SessionProvider>

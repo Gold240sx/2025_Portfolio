@@ -510,7 +510,7 @@ const SidebarMenuItem = React.forwardRef<
   HTMLLIElement,
   React.ComponentProps<"li">
 >(({ className, ...props }, ref) => (
-  <div
+  <li
     ref={ref}
     data-sidebar="menu-item"
     className={cn("group/menu-item relative list-none", className)}
@@ -708,9 +708,9 @@ const SidebarMenuSub = React.forwardRef<
 SidebarMenuSub.displayName = "SidebarMenuSub";
 
 const SidebarMenuSubItem = React.forwardRef<
-  HTMLLIElement,
-  React.ComponentProps<"li">
->(({ ...props }, ref) => <li ref={ref} {...props} />);
+  HTMLDivElement,
+  React.ComponentProps<"div">
+>(({ ...props }, ref) => <div ref={ref} {...props} />);
 SidebarMenuSubItem.displayName = "SidebarMenuSubItem";
 
 const SidebarMenuSubButton = React.forwardRef<

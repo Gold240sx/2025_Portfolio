@@ -58,6 +58,7 @@ export const siteContentRouter = createTRPCRouter({
         .values({
           key: "aboutMeTitle",
           title: input.title,
+          content: "",
         })
         .onConflictDoUpdate({
           target: siteContent.key,
@@ -76,4 +77,44 @@ export const siteContentRouter = createTRPCRouter({
       updatedBy: content?.updatedBy,
     };
   }),
+
+  getHomeContent: publicProcedure.query(async ({ ctx }) => {
+    const content = await ctx.db.query.siteContent.findFirst({
+      where: (table) => eq(table.key, "home"),
+    });
+    return {
+      title: content?.title ?? "",
+      content: content?.content ?? "",
+      logoUrl: content?.logoUrl ?? null,
+    };
+  }),
+
+  updateHome: protectedProcedure
+    .input(
+      z.object({
+        title: z.string().optional(),
+        content: z.string().optional(),
+        logoUrl: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db
+        .insert(siteContent)
+        .values({
+          key: "home",
+          title: input.title ?? "",
+          content: input.content ?? "",
+          logoUrl: input.logoUrl,
+          updatedAt: new Date(),
+          updatedBy: ctx.session.user.name ?? "Unknown",
+        })
+        .onConflictDoUpdate({
+          target: siteContent.key,
+          set: {
+            ...input,
+            updatedAt: new Date(),
+            updatedBy: ctx.session.user.name ?? "Unknown",
+          },
+        });
+    }),
 });

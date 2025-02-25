@@ -66,7 +66,7 @@ export function SignInButton() {
   return (
     <button
       onClick={() => void signIn("discord")}
-      className="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm text-white hover:bg-white/20"
+      className="flex items-center gap-2 rounded-lg bg-black/10 px-4 py-2 text-sm hover:bg-black/20 dark:bg-white/10 dark:text-white dark:hover:bg-white/20"
     >
       <span>Sign in</span>
     </button>

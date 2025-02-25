@@ -10,8 +10,9 @@ import { DatabaseInfoPanel } from "~/components/admin/DatabaseInfoPanel";
 import { type PageConfig } from "~/types/content";
 import { Button } from "@/components/ui/button";
 import { Code } from "lucide-react";
+import { LogoUploader } from "~/components/admin/LogoUploader";
 
-type PageKey = "about" | "projects" | "contact" | "blog";
+type PageKey = "home" | "about" | "projects" | "contact" | "blog";
 
 export default function PageContentPage() {
   const [currentPage, setCurrentPage] = useState<PageKey>("about");
@@ -23,24 +24,23 @@ export default function PageContentPage() {
   if (!config) return null;
 
   const { data: content, isLoading } =
-    api.siteContent.getAboutMeContent.useQuery();
+    api.siteContent[config.getQuery as keyof typeof api.siteContent].useQuery();
   const utils = api.useUtils();
   const { toast } = useToast();
 
-  const { mutate: updateContent, isPending } =
-    api.siteContent.updateAboutMe.useMutation({
-      onSuccess: () => {
-        toast({ title: "Content saved successfully!" });
-        utils.siteContent.getAboutMeContent.invalidate();
-        setIsEditing(false);
-      },
-      onError: (error) => {
-        toast({
-          title: "Error saving content",
-          description: error.message,
-        });
-      },
-    });
+  const { mutate: updateContent } = api.siteContent[
+    config.updateQuery as keyof typeof api.siteContent
+  ].useMutation({
+    onSuccess: () => {
+      toast({ title: "Content saved successfully!" });
+      utils.siteContent[
+        config.getQuery as keyof typeof api.siteContent
+      ].invalidate();
+    },
+    onError: (error) => {
+      toast({ title: "Error", description: error.message });
+    },
+  });
 
   const handleSave = (section: ContentSection) => {
     updateContent({
@@ -57,6 +57,23 @@ export default function PageContentPage() {
 
   const renderEditor = () => {
     switch (currentPage) {
+      case "home":
+        return (
+          <div className="flex min-h-[500px] flex-col space-y-6 rounded-lg bg-card p-6 shadow-sm">
+            <h2 className="text-xl font-semibold text-foreground">
+              Website Settings
+            </h2>
+            <LogoUploader
+              currentLogo={content?.logoUrl}
+              onLogoUpdate={(url) => {
+                updateContent({
+                  logoUrl: url,
+                });
+              }}
+              isUpdating={isLoading}
+            />
+          </div>
+        );
       case "about":
         return (
           <ContentEditor
@@ -71,7 +88,7 @@ export default function PageContentPage() {
             mode={mode}
             setMode={setMode}
             onSave={handleSave}
-            isPending={isPending}
+            isPending={isLoading}
           />
         );
       case "projects":

@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "~/components/providers/theme-provider";
 import { cn } from "~/lib/utils";
+import { SidebarProvider } from "~/contexts/SidebarContext";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -35,14 +36,15 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Providers>
-            <div className="flex min-h-screen flex-col">
-              <Navbar />
-              <AnimatePresence mode="wait">{children}</AnimatePresence>
-            </div>
-            <Toaster />
-            <SonnerToaster />
-          </Providers>
+          <SidebarProvider>
+            <Providers>
+              <div className="flex min-h-screen flex-col">
+                <AnimatePresence mode="wait">{children}</AnimatePresence>
+              </div>
+              <Toaster />
+              <SonnerToaster />
+            </Providers>
+          </SidebarProvider>
         </ThemeProvider>
       </body>
     </html>

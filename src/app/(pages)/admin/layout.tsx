@@ -23,7 +23,7 @@ export default async function AdminLayout({
     <div className="flex min-h-screen w-screen text-black dark:text-white">
       <AppSidebar />
       <div className="relative flex w-full flex-col">
-        <div className=""></div>
+        <Navbar />
         <main className="flex-1 md:p-6">{children}</main>
       </div>
     </div>
