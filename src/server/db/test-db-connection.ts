@@ -3,20 +3,33 @@ console.log("🚀 Starting database connection test");
 
 import postgres from "postgres";
 
+import { env } from "~/env";
+import * as dotenv from "dotenv";
+
+// Load environment variables from .env file
+// This is needed when running the script directly with tsx
+dotenv.config();
+
 async function testConnection() {
   console.log("🔌 Attempting to connect to database...");
 
+  const databaseUrl =
+    env.DATABASE_URL ||
+    process.env.DATABASE_URL ||
+    process.env.NEXT_PUBLIC_DATABASE_URL;
+
+  if (!databaseUrl) {
+    throw new Error("❌ DATABASE_URL is not defined");
+  }
+
   try {
     // Use the same connection string as in seed.ts
-    const connection = postgres(
-      "postgresql://postgres.qregsufrbbvldyfqitph:byhrex-wufvi0-wixjEb@aws-0-us-east-2.pooler.supabase.com:6543/postgres",
-      {
-        max: 1,
-        ssl: {
-          rejectUnauthorized: false,
-        },
+    const connection = postgres(databaseUrl, {
+      max: 1,
+      ssl: {
+        rejectUnauthorized: false,
       },
-    );
+    });
 
     console.log("✅ Database connection established");
 

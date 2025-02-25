@@ -4,14 +4,22 @@ import postgres from "postgres";
 import { env } from "~/env";
 import fs from "fs";
 import path from "path";
+import * as dotenv from "dotenv";
 import { seed } from "./seed";
 
-export async function runMigrations() {
-  if (!env.DATABASE_URL) {
-    throw new Error("DATABASE_URL is not defined");
-  }
+// Load environment variables
+dotenv.config();
 
-  const connection = postgres(env.DATABASE_URL, {
+// Use a fallback to ensure DATABASE_URL is a string
+const databaseUrl = env.DATABASE_URL || process.env.DATABASE_URL || "";
+if (databaseUrl == "") {
+  console.log("❌ No ENV.DATABASE_URL found");
+}
+
+export async function runMigrations() {
+  console.log("🔌 Connecting to database...");
+
+  const connection = postgres(databaseUrl, {
     max: 1,
     ssl: {
       rejectUnauthorized: false,
@@ -25,6 +33,7 @@ export async function runMigrations() {
       "utf8",
     );
     await connection.unsafe(enumSql);
+    console.log("✅ Enum migration completed");
   } catch (error) {
     console.log("Enum migration error (can be ignored if enums exist):", error);
   }
@@ -44,6 +53,7 @@ export async function runMigrations() {
     throw error;
   } finally {
     await connection.end();
+    console.log("🔌 Database connection closed");
   }
 }
 

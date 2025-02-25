@@ -1,37 +1,44 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { env } from "~/env";
+import * as dotenv from "dotenv";
 
+// Load environment variables
+dotenv.config();
+
+// Use a fallback to ensure DATABASE_URL is a string
+const databaseUrl = env.DATABASE_URL || process.env.DATABASE_URL || "";
+if (databaseUrl == "") {
+  console.log("❌ No ENV.DATABASE_URL found");
+}
 const dropQuery = `
-DO $$ 
-DECLARE 
-  r RECORD;
-BEGIN
-  -- Drop all tables with cascade
-  FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = current_schema() AND tablename LIKE 'T3Test_%') 
-  LOOP
-    EXECUTE 'DROP TABLE IF EXISTS "' || r.tablename || '" CASCADE';
-  END LOOP;
-
-  -- Drop all sequences
-  FOR r IN (SELECT sequencename FROM pg_sequences WHERE schemaname = current_schema()) 
-  LOOP
-    EXECUTE 'DROP SEQUENCE IF EXISTS "' || r.sequencename || '" CASCADE';
-  END LOOP;
-END $$;
+  DROP SCHEMA public CASCADE;
+  CREATE SCHEMA public;
+  GRANT ALL ON SCHEMA public TO postgres;
+  GRANT ALL ON SCHEMA public TO public;
 `;
 
 async function main() {
-  const sql = postgres(env.DATABASE_URL);
+  const sql = postgres(databaseUrl, {
+    ssl: {
+      rejectUnauthorized: false,
+    },
+  });
 
   try {
+    console.log("Dropping all tables...");
     await sql.unsafe(dropQuery);
-    console.log("Successfully dropped all tables and sequences");
+    console.log("All tables dropped successfully");
   } catch (error) {
-    console.error("Failed to drop:", error);
+    console.error("Failed to drop tables:", error);
+    throw error;
   } finally {
     await sql.end();
+    console.log("Database connection closed");
   }
 }
 
-main().catch(console.error);
+main().catch((e) => {
+  console.error("Failed to drop tables", e);
+  process.exit(1);
+});
